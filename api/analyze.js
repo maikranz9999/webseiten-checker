@@ -39,7 +39,6 @@ Bewerte jeden Punkt von 1–10 und gib 2–3 konkrete Verbesserungsvorschläge.
           "Content-Type": "application/json",
           "x-api-key": anthropicKey,
           "anthropic-version": "2023-06-01",
-          "anthropic-beta": "messages-2025-03-20"
         },
         body: JSON.stringify({
           model,
