@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Webseiten-Checker</title>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f4f6fb;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #1355a2;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 16px;
+      width: 100%;
+      background: #1355a2;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #10447f;
+    }
+
+    #results {
+      display: none;
+      margin-top: 30px;
+    }
+
+    .screenshot {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border: 1px solid #ddd;
+    }
+
+    .card {
+      background: #f8f9fc;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .category {
+      font-weight: bold;
+      color: #1355a2;
+      margin-bottom: 8px;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      font-size: 15px;
+      color: #333;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Webseiten-Checker</h1>
+    <input id="urlInput" type="text" placeholder="https://deine-seite.de" />
+    <button id="analyzeBtn">Analyse starten</button>
+
+    <div id="results">
+      <img id="siteScreenshot" class="screenshot" />
+      <div id="feedbackCards"></div>
+    </div>
+  </div>
+
+  <script>
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const feedbackCards = document.getElementById("feedbackCards");
+    const screenshotEl = document.getElementById("siteScreenshot");
+    const results = document.getElementById("results");
+
+    analyzeBtn.addEventListener("click", async () => {
+      const url = document.getElementById("urlInput").value.trim();
+      if (!url) return alert("Bitte eine URL eingeben.");
+
+      analyzeBtn.textContent = "Analysiere...";
+      analyzeBtn.disabled = true;
+
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
+
+        const data = await response.json();
+        screenshotEl.src = data.screenshot;
+        results.style.display = "block";
+
+        feedbackCards.innerHTML = "";
+        const sections = data.feedback.split(/\n(?=\d\.)/g); // Trenne nach Punkten
+        sections.forEach((section) => {
+          const card = document.createElement("div");
+          card.classList.add("card");
+          const lines = section.trim().split("\n");
+          const title = lines[0]?.replace(/^\d\.\s*/, "") || "Ergebnis";
+          const text = lines.slice(1).join("\n");
+          card.innerHTML = `<div class="category">${title}</div><pre>${text}</pre>`;
+          feedbackCards.appendChild(card);
+        });
+      } catch (err) {
+        alert("Fehler bei der Analyse. Bitte erneut versuchen.");
+        console.error(err);
+      } finally {
+        analyzeBtn.textContent = "Analyse starten";
+        analyzeBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
