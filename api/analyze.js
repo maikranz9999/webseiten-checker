@@ -34,9 +34,10 @@ Bewerte jeden Punkt von 1–10 und gib 2–3 konkrete Verbesserungsvorschläge.
         "Content-Type": "application/json",
         "x-api-key": anthropicKey,
         "anthropic-version": "2023-06-01"
+
       },
       body: JSON.stringify({
-        model: "claude-3-5-sonnet-20240620",
+        model: "claude-sonnet-4-5-20250929",
         max_tokens: 800,
         messages: [{ role: "user", content: prompt }]
       })
