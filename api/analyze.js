@@ -33,8 +33,8 @@ Bewerte jeden Punkt von 1–10 und gib 2–3 konkrete Verbesserungsvorschläge.
       headers: {
         "Content-Type": "application/json",
         "x-api-key": anthropicKey,
-        "anthropic-version": "2023-06-01"
-
+        "anthropic-version": "2023-06-01",
+        "anthropic-beta": "messages-2025-03-20"
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-5-20250929",
@@ -43,7 +43,16 @@ Bewerte jeden Punkt von 1–10 und gib 2–3 konkrete Verbesserungsvorschläge.
       })
     });
 
-    const data = await aiResponse.json();
+    const text = await aiResponse.text();
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Fehler beim JSON-Parsing:", text);
+      throw new Error("Ungültige Antwort von Anthropic");
+    }
+
     const feedback = data.content?.[0]?.text || "Keine Antwort von der KI erhalten.";
 
     res.status(200).json({
